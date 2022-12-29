@@ -30,7 +30,7 @@ namespace ListResolutions
         {
             if (AlreadyRunning())
             {
-                Environment.Exit(0);
+                Exit();
             }
 
             HandleFlags(args, out bool keepOpen, out bool minimize, out bool hide);
@@ -71,6 +71,8 @@ namespace ListResolutions
                     mode.dmDisplayFrequency = targetHz;
                     ChangeDisplaySettings(ref mode, 0);
                     if (keepOpen) continue;
+
+                    Exit();
                     break;
                 }
             }
@@ -109,6 +111,11 @@ namespace ListResolutions
         {
             string name = Process.GetCurrentProcess().ProcessName;
             return Process.GetProcessesByName(name).Length > 1;
+        }
+
+        private static void Exit()
+        {
+            Environment.Exit(0);
         }
 
     }
