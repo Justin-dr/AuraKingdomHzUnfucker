@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace ListResolutions
+namespace AuraKingdomHzUnfucker
 {
 
     public class Program
