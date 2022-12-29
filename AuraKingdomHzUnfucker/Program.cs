@@ -28,6 +28,7 @@ namespace ListResolutions
 
         public static void Main(string[] args)
         {
+            Console.Title = "AuraKingdomHzUnfucker by Xepos";
             if (AlreadyRunning())
             {
                 Exit();
