@@ -1,6 +1,7 @@
 ﻿using AuraKingdomHzUnfucker.Structs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -28,7 +29,7 @@ namespace AuraKingdomHzUnfucker.Polling
 
             while (await timer.WaitForNextTickAsync() && EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref mode))
             {
-                Console.WriteLine("Poll: " + mode.dmDisplayFrequency);
+                Debug.WriteLine("Poll: " + mode.dmDisplayFrequency);
                 if (mode.dmDisplayFrequency != targetHz)
                 {
                     mode.dmDisplayFrequency = targetHz;
