@@ -1,6 +1,7 @@
 ﻿using AuraKingdomHzUnfucker.Polling;
 using AuraKingdomHzUnfucker.Structs;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace AuraKingdomHzUnfucker
@@ -15,7 +16,7 @@ namespace AuraKingdomHzUnfucker
 
         public static async Task Main(string[] args)
         {
-            Console.Title = "AuraKingdomHzUnfucker by Xepos";
+            Console.Title = "AuraKingdomHzUnfucker by Xepos v" + Assembly.GetEntryAssembly()?.GetName().Version ?? "null";
             if (AlreadyRunning())
             {
                 Exit();
