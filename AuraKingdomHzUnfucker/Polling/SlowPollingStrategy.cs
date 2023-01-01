@@ -10,9 +10,11 @@ namespace AuraKingdomHzUnfucker.Polling
 {
     internal class SlowPollingStrategy : PollingStrategy
     {
-        PeriodicTimer timer;
+        private readonly PeriodicTimer timer;
+        private readonly double delay;
         public SlowPollingStrategy(bool keepOpen, double seconds) : base(keepOpen)
         {
+            delay = seconds;
             timer = new PeriodicTimer(TimeSpan.FromSeconds(seconds));
         }
 
@@ -21,6 +23,8 @@ namespace AuraKingdomHzUnfucker.Polling
             DEVMODE mode = new();
             mode.dmSize = (ushort)Marshal.SizeOf(mode);
             uint targetHz = GetTargetFrequency(ref mode);
+
+            Console.WriteLine("Running with polling delay: " + delay + " seconds.");
 
             while (await timer.WaitForNextTickAsync() && EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref mode))
             {

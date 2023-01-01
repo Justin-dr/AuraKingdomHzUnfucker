@@ -61,7 +61,7 @@ namespace AuraKingdomHzUnfucker
                 else if (pollingDelay <= 0 && (arg.StartsWith("-delay:") || arg.StartsWith("-d:")))
                 {
                     string[] delaySplit = arg.Split(':');
-                    if (!double.TryParse(delaySplit[1], out double result))
+                    if (!double.TryParse(delaySplit[1].Replace('.', ','), out double result))
                     {
                         throw new FormatException("Could not parse " + delaySplit[1] + " to a number!");
                     }
