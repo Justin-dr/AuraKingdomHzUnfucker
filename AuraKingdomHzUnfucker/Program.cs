@@ -34,7 +34,6 @@ namespace AuraKingdomHzUnfucker
             {
                 ShowWindow(GetConsoleWindow(), 6);
             }
-
             await pollingStrategy.StartPolling();
         }
 

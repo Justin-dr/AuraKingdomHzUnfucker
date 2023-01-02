@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace AuraKingdomHzUnfucker.Polling
 {
+    [Obsolete]
     internal class FastPollingStrategy : PollingStrategy
     {
         public FastPollingStrategy(bool keepOpen) : base(keepOpen)
