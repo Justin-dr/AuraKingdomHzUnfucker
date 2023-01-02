@@ -25,7 +25,7 @@ namespace AuraKingdomHzUnfucker.Polling
             mode.dmSize = (ushort)Marshal.SizeOf(mode);
             uint targetHz = GetTargetFrequency(ref mode);
 
-            Console.WriteLine("Running with polling delay: " + delay + " seconds.");
+            Console.WriteLine("Running with polling delay: " + delay + " second" + (delay == 1 ? "." : "s."));
 
             while (await timer.WaitForNextTickAsync() && EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref mode))
             {
