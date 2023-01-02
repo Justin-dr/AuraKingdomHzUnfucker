@@ -24,7 +24,7 @@ namespace AuraKingdomHzUnfucker
 
             HandleFlags(args, out bool keepOpen, out bool minimize, out bool hide, out double pollingDelay);
 
-            PollingStrategy pollingStrategy = pollingDelay <= 0 ? new FastPollingStrategy(keepOpen) : new SlowPollingStrategy(keepOpen, pollingDelay);
+            PollingStrategy pollingStrategy = new SlowPollingStrategy(keepOpen, pollingDelay <= 0 ? 1 : pollingDelay);
 
             if (hide)
             {
