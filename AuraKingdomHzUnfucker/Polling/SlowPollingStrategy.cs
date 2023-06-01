@@ -1,4 +1,5 @@
-﻿using AuraKingdomHzUnfucker.Structs;
+﻿using AuraKingdomHzUnfucker.Data;
+using AuraKingdomHzUnfucker.Structs;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,34 +13,31 @@ namespace AuraKingdomHzUnfucker.Polling
     internal class SlowPollingStrategy : PollingStrategy
     {
         private readonly PeriodicTimer timer;
-        private readonly double delay;
-        public SlowPollingStrategy(bool keepOpen, double seconds) : base(keepOpen)
+        public SlowPollingStrategy(ApplicationFlags flags) : base(flags)
         {
-            delay = seconds;
-            timer = new PeriodicTimer(TimeSpan.FromSeconds(seconds));
+            timer = new PeriodicTimer(TimeSpan.FromSeconds(_flags.PollingDelay));
         }
 
         public override async Task StartPolling()
         {
-            DEVMODE mode = new();
-            mode.dmSize = (ushort)Marshal.SizeOf(mode);
-            uint targetHz = GetTargetFrequency(ref mode);
+            DEVMODE mode = CreateDevMode();
+            FuncRef<bool, DEVMODE> actionRef = GetSettingsAction();
 
-            Console.WriteLine("Running with polling delay: " + delay + " second" + (delay == 1 ? "." : "s."));
+            Console.WriteLine("Running with polling delay: " + _flags.PollingDelay + " second" + (_flags.PollingDelay == 1 ? "." : "s."));
 
-            while (await timer.WaitForNextTickAsync() && EnumDisplaySettings(null, ENUM_CURRENT_SETTINGS, ref mode))
+            while (await timer.WaitForNextTickAsync())
             {
-                Debug.WriteLine("Poll: " + mode.dmDisplayFrequency);
-                if (mode.dmDisplayFrequency != targetHz)
+                bool anyChange = actionRef.Invoke(ref mode);
+                if (!_flags.KeepOpen && anyChange)
                 {
-                    mode.dmDisplayFrequency = targetHz;
-                    ChangeDisplaySettings(ref mode, 0);
-                    if (_keepOpen) continue;
-
                     Program.Exit();
                     break;
                 }
+
+                continue;
             }
         }
+
+        
     }
 }

@@ -1,4 +1,6 @@
-﻿using AuraKingdomHzUnfucker.Polling;
+﻿using AuraKingdomHzUnfucker.Data;
+using AuraKingdomHzUnfucker.Enums;
+using AuraKingdomHzUnfucker.Polling;
 using AuraKingdomHzUnfucker.Structs;
 using System.Diagnostics;
 using System.Reflection;
@@ -22,43 +24,42 @@ namespace AuraKingdomHzUnfucker
                 Exit();
             }
 
-            HandleFlags(args, out bool keepOpen, out bool minimize, out bool hide, out double pollingDelay);
+            ApplicationFlags applicationFlags = HandleFlags(args);
+            PollingStrategy pollingStrategy = new SlowPollingStrategy(applicationFlags);
 
-            PollingStrategy pollingStrategy = new SlowPollingStrategy(keepOpen, pollingDelay <= 0 ? 1 : pollingDelay);
-
-            if (hide)
+            if (applicationFlags.WindowState == WindowState.Hide)
             {
                 ShowWindow(GetConsoleWindow(), 0);
             }
-            else if (minimize)
+            else if (applicationFlags.WindowState == WindowState.Minimize)
             {
                 ShowWindow(GetConsoleWindow(), 6);
             }
             await pollingStrategy.StartPolling();
         }
 
-        private static void HandleFlags(string[] args, out bool keepOpen, out bool minimize, out bool hide, out double pollingDelay)
+        private static ApplicationFlags HandleFlags(string[] args)
         {
-            keepOpen = false;
-            minimize = false;
-            hide = false;
-            pollingDelay = -1L;
+            bool keepOpen = false;
+            WindowState windowState = WindowState.Normal;
+            Monitors monitors = Monitors.Current;
+            double pollingDelay = -1L;
 
             foreach (var arg in args)
             {
-                if (arg == "-keep-open" || arg == "-ko" || arg == "-k")
+                if (arg == "--keep-open" || arg == "--ko" || arg == "-k")
                 {
                     keepOpen = true;
                 }
-                else if (!hide && (arg == "-minimize" || arg == "-m"))
+                else if (windowState != WindowState.Hide && (arg == "--minimize" || arg == "-m"))
                 {
-                    minimize = true;
+                    windowState = WindowState.Minimize;
                 }
-                else if (!minimize && (arg == "-hide" || arg == "-h"))
+                else if (windowState != WindowState.Minimize && (arg == "--hide" || arg == "-h"))
                 {
-                    hide = true;
+                    windowState = WindowState.Hide;
                 }
-                else if (pollingDelay <= 0 && (arg.StartsWith("-delay:") || arg.StartsWith("-d:")))
+                else if (pollingDelay <= 0 && (arg.StartsWith("--delay:") || arg.StartsWith("-d:")))
                 {
                     string[] delaySplit = arg.Split(':');
                     if (!double.TryParse(delaySplit[1].Replace('.', ','), out double result))
@@ -67,7 +68,13 @@ namespace AuraKingdomHzUnfucker
                     }
                     pollingDelay = result;
                 }
+                else if (arg == "-a" || arg == "--all")
+                {
+                    monitors = Monitors.All;
+                }
             }
+
+            return new ApplicationFlags(keepOpen, windowState, monitors, pollingDelay <= 0.1 ? 0.1 : pollingDelay);
         }
 
         private static bool AlreadyRunning()
