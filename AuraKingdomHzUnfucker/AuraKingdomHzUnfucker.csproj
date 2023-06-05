@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-	<Version>0.5.0</Version>
+	  <Version>0.5.1</Version>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-	<PublishAot>true</PublishAot>
+	  <PublishAot>true</PublishAot>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 

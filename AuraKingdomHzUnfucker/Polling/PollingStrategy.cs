@@ -59,12 +59,12 @@ namespace AuraKingdomHzUnfucker.Polling
                 return mode.dmDisplayFrequency;
             }
 
-            throw new Exception();
+            throw new Exception($"Failed to get display settings for monitor: " + monitorInfo?.Name ?? "default");
         }
 
         private void InitMonitors()
         {
-            bool initCompleted = EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData)
+            EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, delegate (IntPtr hMonitor, IntPtr hdcMonitor, ref RECT lprcMonitor, IntPtr dwData)
             {
                 MONITORINFOEX mon_info = new MONITORINFOEX();
                 mon_info.Size = (uint)Marshal.SizeOf(mon_info);
@@ -72,14 +72,14 @@ namespace AuraKingdomHzUnfucker.Polling
 
                 if (success)
                 {
-                    string name = mon_info.DeviceName;
-                    if (!string.IsNullOrEmpty(name))
+                    string deviceName = mon_info.DeviceName;
+                    if (!string.IsNullOrEmpty(deviceName))
                     {
                         DEVMODE mode = new DEVMODE();
                         mode.dmSize = (ushort)Marshal.SizeOf(mode);
 
-                        byte[] nameBytes = ToLPTStr(name);
-                        MonitorInfo monitorInfo = new MonitorInfo(nameBytes, name.RemoveSpecialCharacters());
+                        byte[] nameBytes = deviceName.ToLPTStr();
+                        MonitorInfo monitorInfo = new MonitorInfo(nameBytes, deviceName.RemoveSpecialCharacters() ?? "UNKOWN");
 
                         uint hz = GetTargetFrequency(ref mode, monitorInfo, _flags.Monitors);
                         monitorInfo.TargetHz = hz;
@@ -87,16 +87,9 @@ namespace AuraKingdomHzUnfucker.Polling
                         _monitors.Add(monitorInfo);
                         return true;
                     }
-                    return false;
                 }
-
-                return true;
+                throw new Exception("Failed to initialize monitor");
             }, IntPtr.Zero);
-
-            if (!initCompleted)
-            {
-                throw new Exception();
-            }
         }
 
         private bool UpdateAllMonitors(ref DEVMODE mode)
@@ -137,18 +130,7 @@ namespace AuraKingdomHzUnfucker.Polling
             return _flags.Monitors == Enums.Monitors.All ? UpdateAllMonitors : UpdateSingleMonitor;
         }
 
-        public static byte[] ToLPTStr(string str)
-        {
-            var lptArray = new byte[str.Length + 1];
-
-            var index = 0;
-            foreach (char c in str.ToCharArray())
-                lptArray[index++] = Convert.ToByte(c);
-
-            lptArray[index] = Convert.ToByte('\0');
-
-            return lptArray;
-        }
+        
 
         protected static DEVMODE CreateDevMode()
         {

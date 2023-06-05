@@ -1,12 +1,5 @@
 ﻿using AuraKingdomHzUnfucker.Data;
 using AuraKingdomHzUnfucker.Structs;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AuraKingdomHzUnfucker.Polling
 {
@@ -21,13 +14,13 @@ namespace AuraKingdomHzUnfucker.Polling
         public override async Task StartPolling()
         {
             DEVMODE mode = CreateDevMode();
-            FuncRef<bool, DEVMODE> actionRef = GetSettingsAction();
+            FuncRef<bool, DEVMODE> funcRef = GetSettingsAction();
 
             Console.WriteLine("Running with polling delay: " + _flags.PollingDelay + " second" + (_flags.PollingDelay == 1 ? "." : "s."));
 
             while (await timer.WaitForNextTickAsync())
             {
-                bool anyChange = actionRef.Invoke(ref mode);
+                bool anyChange = funcRef.Invoke(ref mode);
                 if (!_flags.KeepOpen && anyChange)
                 {
                     Program.Exit();
